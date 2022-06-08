@@ -5,7 +5,7 @@ import { OasisClient } from "oasis-framework";
 import { enableCommandContextWithCustomPrefix } from "oasis-framework/contrib";
 import { loadDirs } from "oasis-framework";
 import { config, handler } from "./internals/config.js";
-import Prisma from "./internals/database.js";
+// import Prisma from "./internals/database.js";
 
 if (handler) {
     const { rootDirectory, loadDirectories } = handler;
@@ -47,23 +47,34 @@ const inviteUrl = (botId: bigint, perms: number) =>
 
 const client = new Client({
     ready(bot, payload) {
-        console.info("Ready! logged as %s with id %d", payload.user.username, bot.id);
+        console.info(
+            "Ready! logged as",
+            payload.user.username,
+            "with id",
+            bot.id,
+            "with prefix:",
+            config.prefix
+        );
         console.info(inviteUrl(bot.id, BASE_PERMISSIONS));
     },
 });
 
-const prefixFn = async (guildId: bigint  | undefined) => {
-    const currentGuild = await Prisma.guild.findUnique({
-        where: {
-            id: guildId,
-        },
-    });
+const prefixFn = async (_guildId?: bigint) => {
+    // const currentGuild = await Prisma.guild.findUnique({
+    //     where: {
+    //         id: guildId,
+    //     },
+    // });
 
-    return currentGuild?.prefix ?? config.prefix;
+    // return currentGuild?.prefix ?? config.prefix;
+    return config.prefix;
 };
 
 await client.start([
     enableMiddleware,
     enableCachePlugin,
-    (bot) => { enableCommandContextWithCustomPrefix(prefixFn)(bot); return bot; }
+    bot => {
+        enableCommandContextWithCustomPrefix(prefixFn)(bot);
+        return bot;
+    },
 ]);
