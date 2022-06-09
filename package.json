@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -e ts --exec 'npm run start'",
-    "start": "npx prisma generate && tsc && node --no-warnings dist/index.js",
+    "start": "node --no-warnings dist/index.js",
+    "devbg": "npx prisma generate && tsc --watch",
     "fmt": "prettier -w ./src"
   },
   "repository": {
@@ -21,7 +22,8 @@
   "homepage": "https://github.com/yuzudev/akebi#readme",
   "dependencies": {
     "@prisma/client": "^3.12.0",
-    "oasis-framework": "^1.6.0",
+    "oasis": "^0.0.0",
+    "oasis-framework": "^2.0.0",
     "prisma": "^3.12.0",
     "toml": "^3.0.0",
     "tslib": "^2.3.1"

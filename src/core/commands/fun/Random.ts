@@ -4,6 +4,8 @@ import { Argument, Command } from "oasis-framework";
 import { chooseRandom } from "./Gif.js";
 
 class RandomNumber {
+    readonly parent = "random";
+
     @Argument("🔢 The random number will be higher than this minimum.")
     minimum!: number;
 
@@ -25,6 +27,8 @@ class RandomNumber {
 }
 
 class Random8Ball {
+    readonly parent = "random";
+
     @Argument("🔮 What question would you like to ask?", true)
     question!: string;
 
@@ -56,6 +60,8 @@ class Random8Ball {
 }
 
 class RandomAdvice {
+    readonly parent = "random";
+
     get options() {
         return [];
     }
@@ -104,18 +110,28 @@ export class Random {
             "🔢 Pick a random number, send a random advice or ask 8ball a random question.",
     };
 
-    @Argument.SubCommand("🔢 Pick a random number", false, new RandomNumber())
-    subcommandNumber!: RandomNumber;
+    @Argument.SubCommand("🔢 Pick a random number", new RandomNumber())
+    number!: RandomNumber;
 
-    @Argument.SubCommand("🔮 Get answers to your questions!", false, new Random8Ball())
-    subcommand8Ball!: Random8Ball;
+    @Argument.SubCommand("🔮 Get answers to your questions!", new Random8Ball())
+    "8ball"!: Random8Ball;
 
-    @Argument.SubCommand("🗨️ Receive random advice in the chat.", false, new RandomAdvice())
-    subcommandAdvice!: RandomAdvice;
+    @Argument.SubCommand("🗨️ Receive random advice in the chat.", new RandomAdvice())
+    advice!: RandomAdvice;
 
-    async run(_ctx: Context<BotWithCache>) {
-        // await ctx.respondPrivately({
-        //     with: `You must choose one of the subcommands to use: **number**, **8ball**, or **advice**.`,
-        // });
+    get options() {
+        return [this.number, this["8ball"], this.advice];
+    }
+
+    async run(ctx: Context<BotWithCache>) {
+        const command = ctx.options.getSubcommand();
+        if (!command) {
+            await ctx.respondPrivately({
+                with: `You must choose one of the subcommands to use: **number**, **8ball**, or **advice**.`,
+            });
+            return;
+        }
+
+        console.log(command);
     }
 }
